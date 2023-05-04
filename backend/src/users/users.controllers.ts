@@ -10,8 +10,9 @@ class UsersController {
 
     async getUserById(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
-            const user = await usersService.getUserById(req.body.id);
-            res.status(200).send(user);
+            const user = res.locals.user;
+            console.log(user);
+            res.status(200).send(JSON.stringify(user));
         } catch (error: any) {
             error.status = 400;
             next(error);

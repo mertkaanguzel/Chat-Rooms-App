@@ -12,7 +12,7 @@ class UsersMiddleware {
     ) {
         try {
             const user = await UsersService.getUserByEmail(req.body.email);
-            if (user) throw new Error('Email already in use'); 
+            if (user) throw new Error('Email already in use');
         } catch (error: any) {
             error.status = 400;
             next(error);
@@ -46,7 +46,7 @@ class UsersMiddleware {
     ) {
         
         try {
-            if (req.params.userId !== res.locals.user._id) {
+            if (req.params.userId !== req.session._id) {
                 throw new Error('Not authorized');
             }
             next();  

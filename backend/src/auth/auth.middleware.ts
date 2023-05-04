@@ -16,7 +16,7 @@ class AuthMiddleware {
 
             if (user && await bcrypt.compare(req.body.password, user.password)) {
                 res.locals = {
-                    userId: user._id,
+                    _id: user._id,
                     //email: user.email,
                     //permissionFlags: user.permissionFlags,
                 };
@@ -34,7 +34,7 @@ class AuthMiddleware {
         next: express.NextFunction
     ) {
         try {
-            if (!req.session || !req.session.user) {
+            if (!req.session || !req.session._id) {
                 throw new Error('Not authenticated');
             }
             next();

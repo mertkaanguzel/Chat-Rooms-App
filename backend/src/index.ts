@@ -12,7 +12,8 @@ import RedisStore from 'connect-redis';
 import session from 'express-session';
 declare module 'express-session' {
     interface SessionData {
-        user: { [key: string]: any };
+        //user: { [key: string]: any };
+        _id: string;
     }
   }
 import { createClient } from 'redis';

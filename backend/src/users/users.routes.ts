@@ -22,7 +22,7 @@ export class UsersRoutes extends CommonRoutes {
                 UsersMiddleware.validateSameEmailDoesntExist,
                 UsersControllers.createUser,
             );
-
+        
         this.app
             .route('/users/:userId')
             .all(
