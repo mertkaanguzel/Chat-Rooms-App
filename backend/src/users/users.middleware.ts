@@ -17,7 +17,7 @@ class UsersMiddleware {
             error.status = 400;
             next(error);
         }
-        next();
+        return next();
     }
 
     async validateUserExists(
@@ -30,7 +30,7 @@ class UsersMiddleware {
             const user = await UsersService.getUserById(req.params.userId);
             if (!user) throw new Error('User does not exist'); 
             res.locals.user = user;
-            next();
+            return next();
             
         } catch (error: any) {
             error.status = 404;

@@ -12,7 +12,7 @@ class UsersController {
         try {
             const user = res.locals.user;
             console.log(user);
-            res.status(200).send(JSON.stringify(user));
+            return res.status(200).send(JSON.stringify(user));
         } catch (error: any) {
             error.status = 400;
             next(error);
@@ -23,7 +23,7 @@ class UsersController {
         try {
             req.body.password = await bcrypt.hash(req.body.password, 10);
             await usersService.createUser(req.body);
-            res.sendStatus(204);
+            return res.sendStatus(204);
         } catch (error: any) {
             error.status = 400;
             next(error);

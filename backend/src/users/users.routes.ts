@@ -14,8 +14,10 @@ export class UsersRoutes extends CommonRoutes {
     configureRoutes(): express.Application {
         this.app.route('/users')
             .post(
-                body('email').isEmail(),
+                body('email').notEmpty().withMessage('email missing').isEmail(),
                 body('password')
+                    .notEmpty()
+                    .withMessage('password missing')
                     .isLength({ min: 5 })
                     .withMessage('Must include password (5+ chars)'),
                 BodyvalidationMiddleware.verifyBodyFieldsErrors,

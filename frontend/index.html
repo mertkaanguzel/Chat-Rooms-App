@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chat Rooms App</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="app">
+      <div id="signup">
+        <h2>Sign up</h2>
+        <form>
+          <label for="email">Email:</label>
+          <input type="text" id="email" name="email">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password">
+          <button type="submit">Sign up</button>
+        </form>
+        <h3 id="message"></h3>
+      </div>
+      <div id="login">
+        <h2>Login</h2>
+        <form>
+          <label for="email">Email:</label>
+          <input type="text" id="email" name="email">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password">
+          <button type="submit">Login</button>
+        </form>
+        <h3 id="message"></h3>
+      </div>
+      <div id="chatrooms">
+        <h2>Chat Rooms</h2>
+        <ul id="chatroom-list"></ul>
+        <form id="create-chatroom-form">
+          <label for="chatroom-name">Create New Chat Room:</label>
+          <input type="text" id="chatroom-name" name="chatroom-name">
+          <button type="submit">Create</button>
+        </form>
+      </div>
+      <div id="messages">
+        <h2>Messages</h2>
+        <ul id="message-list"></ul>
+        <form id="send-message-form">
+          <input type="text" id="message-input" name="message-input" placeholder="Type a message...">
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

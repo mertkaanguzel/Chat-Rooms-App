@@ -13,15 +13,16 @@ class AuthMiddleware {
             const user: any = await UsersService.getUserByEmailWithPassword(
                 req.body.email
             );
-
             if (user && await bcrypt.compare(req.body.password, user.password)) {
+                console.log('hey');
                 res.locals = {
                     _id: user._id,
                     //email: user.email,
                     //permissionFlags: user.permissionFlags,
                 };
-                next();
+                return next();
             }
+            throw new Error('Invalid credentials.');
         } catch (error: any) {
             error.status = 401;
             next(error);
@@ -37,7 +38,7 @@ class AuthMiddleware {
             if (!req.session || !req.session._id) {
                 throw new Error('Not authenticated');
             }
-            next();
+            return next();
         } catch (error: any) {
             error.status = 401;
             next(error);

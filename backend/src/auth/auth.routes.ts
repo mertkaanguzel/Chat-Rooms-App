@@ -11,14 +11,23 @@ export class AuthRoutes extends CommonRoutes {
     }
 
     configureRoutes(): express.Application {
-        
+    /*    
         this.app.post('/auth', [
-            body('email').isEmail(),
-            body('password').isString(),
+            body('email').notEmpty().withMessage('email missing').isEmail(),
+            body('password').notEmpty().withMessage('password missing').isString(),
             BodyvalidationMiddleware.verifyBodyFieldsErrors,
             AuthMiddleware.verifyUserPassword,
             AuthController.setCookie,
         ]);
+*/
+        this.app.route('/auth')
+            .post(
+                body('email').notEmpty().withMessage('email missing').isEmail(),
+                body('password').notEmpty().withMessage('password missing'),
+                BodyvalidationMiddleware.verifyBodyFieldsErrors,
+                AuthMiddleware.verifyUserPassword,
+                AuthController.setCookie,
+            );
         
         return this.app;
     }

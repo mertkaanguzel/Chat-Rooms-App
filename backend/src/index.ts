@@ -70,6 +70,7 @@ app.use(
         saveUninitialized: false,
         secret: 'topSecret',
         resave: false,
+        name: 'sessionId',
         cookie: {
             secure: false,
             httpOnly: true,
@@ -88,6 +89,16 @@ app.get('/', (req: express.Request, res: express.Response) => {
     res.status(200).send(runningMsg);
 });
 
+function errorHandler(error: any, req: express.Request, res: express.Response, next: express.NextFunction) {
+    debugLog( `error ${error.message}`); 
+    const status = error.status || 500;
+    res.status(status).send(JSON.stringify({
+        error: error.message,
+    }));
+}
+
+app.use(errorHandler);
+
 app.listen(port, () => {
     routes.forEach((route: CommonRoutes) => {
         debugLog(`Routes configured for ${route.getName()}`);
@@ -95,11 +106,3 @@ app.listen(port, () => {
 
     console.log(runningMsg);
 });
-
-const errorHandler = async (error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    debugLog( `error ${error.message}`); 
-    const status = error.status || 500;
-    res.status(status).send(error.message);
-};
-
-app.use(errorHandler);
