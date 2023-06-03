@@ -9,6 +9,7 @@ const createChatroomForm = document.getElementById('create-chatroom-form');
 const sendMessageForm = document.getElementById('send-message-form');
 const chatroomNameInput = document.getElementById('chatroom-name');
 const messageInput = document.getElementById('message-input');
+const socket = io('http://localhost:3000');
 /*
 interface User {
   id: number;
@@ -164,9 +165,11 @@ async function handleLogin(event) {
 
   if (statusCode === 200) {
     let responseId = await response.json();
+    console.log(responseId);
     message.innerHTML = 'Sign up Successfull';
-    setTimeout(() => {
+    await setTimeout(() => {
       message.innerHTML = '';
+      showChatrooms(); //after that re render
     }, '3000');
     return;
   }
@@ -219,6 +222,10 @@ async function handleSignup(event) {
 function handleCreateChatroom(event) {
   event.preventDefault();
   const chatroomName = chatroomNameInput.value.trim();
+  if (!chatroomName) alert('Please enter a room name');
+
+  
+  /*
   if (chatroomName) {
     const chatRoom = {
       id: Date.now(),
@@ -231,6 +238,7 @@ function handleCreateChatroom(event) {
     renderChatroomList();
     chatroomNameInput.value = '';
   }
+  */
 }
 
 function handleJoinChatroom(event) {

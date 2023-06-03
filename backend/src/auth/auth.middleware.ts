@@ -14,7 +14,6 @@ class AuthMiddleware {
                 req.body.email
             );
             if (user && await bcrypt.compare(req.body.password, user.password)) {
-                console.log('hey');
                 res.locals = {
                     _id: user._id,
                     //email: user.email,

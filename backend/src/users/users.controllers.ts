@@ -1,5 +1,5 @@
 import express from 'express';
-import usersService from './users.service';
+import UsersService from './users.service';
 import bcrypt from 'bcrypt';
 import debug from 'debug';
 
@@ -22,7 +22,7 @@ class UsersController {
     async createUser(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
             req.body.password = await bcrypt.hash(req.body.password, 10);
-            await usersService.createUser(req.body);
+            await UsersService.createUser(req.body);
             return res.sendStatus(204);
         } catch (error: any) {
             error.status = 400;

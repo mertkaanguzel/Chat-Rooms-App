@@ -1,4 +1,6 @@
 import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import * as dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -21,6 +23,8 @@ import { createClient } from 'redis';
 import { CommonRoutes } from './common/common.routes';
 import { AuthRoutes } from './auth/auth.routes';
 import { UsersRoutes } from './users/users.routes';
+import { RoomsRoutes } from './rooms/rooms.routes';
+import path from 'path';
 
 const dotenvResult = dotenv.config();
 if (dotenvResult.error) {
@@ -28,6 +32,10 @@ if (dotenvResult.error) {
 }
 
 const app: express.Application = express();
+//socket
+const httpServer = createServer(app);
+const io = new Server(httpServer, );
+//socket
 const port = 3000;
 const routes: Array<CommonRoutes> = [];
 const debugLog: debug.IDebugger = debug('app');
@@ -35,7 +43,9 @@ const debugLog: debug.IDebugger = debug('app');
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
 app.use(cors());
-
+//socket
+app.use(express.static(path.join(__dirname, 'public')));
+//socket
 const loggerOpts: expressWinston.LoggerOptions = {
     transports: [new winston.transports.Console()],
     format: winston.format.combine(
@@ -82,6 +92,9 @@ app.use(
 
 routes.push(new AuthRoutes(app));
 routes.push(new UsersRoutes(app));
+//socket
+routes.push(new RoomsRoutes(app));
+//socket
 
 const runningMsg = `Server running at http://localhost:${port}`;
 
@@ -98,7 +111,7 @@ function errorHandler(error: any, req: express.Request, res: express.Response, n
 }
 
 app.use(errorHandler);
-
+/*
 app.listen(port, () => {
     routes.forEach((route: CommonRoutes) => {
         debugLog(`Routes configured for ${route.getName()}`);
@@ -106,3 +119,22 @@ app.listen(port, () => {
 
     console.log(runningMsg);
 });
+*/
+//socket
+httpServer.listen(port, () => {
+    routes.forEach((route: CommonRoutes) => {
+        debugLog(`Routes configured for ${route.getName()}`);
+    });
+
+    console.log(runningMsg);
+});
+//socket
+
+//socket
+io.on('connection', (socket) => {
+    console.log('user connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+});
+//socket
