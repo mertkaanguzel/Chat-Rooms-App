@@ -57,13 +57,7 @@ let chatRooms = [
 let currentChatroom = chatRooms[0];
 */
 
-let users = [
-    {
-        id: 123,
-        username: 'user123',
-        password: '123',
-    },
-];
+let users = [];
 let currentUser = null;
 let chatRooms = [];
 let currentChatroom = null;
@@ -113,24 +107,41 @@ function showMessages() {
 
 function renderChatroomList() {
     chatroomList.innerHTML = '';
+    /*
     for (const chatRoom of chatRooms) {
-        if (chatRoom.members.includes(currentUser.id)) {
-            const li = document.createElement('li');
-            li.textContent = chatRoom.name;
-            li.dataset.chatroom = chatRoom.id;
-            chatroomList.appendChild(li);
-        }
+      if (chatRoom.members.includes(currentUser.id)) {
+        const li = document.createElement('li');
+        li.textContent = chatRoom.name;
+        li.dataset.chatroom = chatRoom.id;
+        chatroomList.appendChild(li);
+      }
+    }
+    */
+    for (const chatRoom of chatRooms) {
+        const li = document.createElement('li');
+        li.textContent = chatRoom.name;
+        li.dataset.chatroom = chatRoom.id;
+        chatroomList.appendChild(li);
     }
 }
 
 function renderMessageList() {
     messageList.innerHTML = '';
     for (const message of currentChatroom.messages) {
+        if (message.userId === currentUser) message.userId = 'You';
         const li = document.createElement('li');
-        const user = users.find((u) => u.id === message.userId);
-        li.textContent = `${user.username}: ${message.text}`;
+        //const user = users.find((u) => u.id === message.userId);
+        //li.textContent = `${user.username}: ${message.text}`;
+        li.textContent = `${message.userId}: ${message.text}`;
         messageList.appendChild(li);
     }
+    /*
+    const message =  currentChatroom.messages.slice(-1);
+    console.log(message);
+    const li = document.createElement('li');
+    li.textContent = `${message.userId}: ${message.text}`;
+    messageList.appendChild(li);
+    */
 }
 
 async function handleLogin(event) {
@@ -166,10 +177,51 @@ async function handleLogin(event) {
     if (statusCode === 200) {
         let responseId = await response.json();
         console.log(responseId);
-        message.innerHTML = 'Sign up Successfull';
+        currentUser = responseId?._id;
+        users.push(currentUser);
+        message.innerHTML = 'Login Successfull';
+
+        const url = `http://localhost:3000/rooms/${currentUser}`;
+        console.log(url);
+        let responseRooms = await fetch(url, {
+            method: 'GET',
+        });
+        console.log(responseRooms.status);
+        if (responseRooms.status === 200) {
+            let roomsArray = await responseRooms.json();
+            console.log('hey');
+            console.log(roomsArray);
+            roomsArray.forEach(room => {
+                chatRooms.push({
+                    id: room._id,
+                    name: room.name,
+                    messages: [],
+
+                });
+            });
+            /*
+          message.innerHTML = 'Sign up Successfull';
+          await setTimeout(() => {
+            message.innerHTML = '';
+            showChatrooms();
+          }, '3000');
+          return;
+          */
+            alert('Chat rooms listed successfully'); // just for now
+            showChatrooms(); //before that fetch users rooms
+            renderChatroomList();
+            return;
+        }
+      
+        let responseRoomsMessage = await responseRooms.json();
+        alert(responseRoomsMessage.error); // just for now
+
+
+
         await setTimeout(() => {
             message.innerHTML = '';
-            showChatrooms(); //after that re render
+            showChatrooms(); //before that fetch users rooms
+            renderChatroomList();
         }, '3000');
         return;
     }
@@ -218,39 +270,107 @@ async function handleSignup(event) {
     }, '3000');
 }
 
-function handleCreateChatroom(event) {
+async function handleCreateChatroom(event) {
     event.preventDefault();
-    const chatroomName = chatroomNameInput.value.trim();
-    if (!chatroomName) alert('Please enter a room name');
-
+    const chatRoomName = chatroomNameInput.value.trim();
+    if (!chatRoomName) {
+        alert('Please enter a room name');
+        return;
+    }
+    
     /*
-  if (chatroomName) {
-    const chatRoom = {
-      id: Date.now(),
-      name: chatroomName,
-      members: [currentUser.id],
-      messages: []
-    };
-    chatRooms.push(chatRoom);
-    saveChatRooms();
-    renderChatroomList();
-    chatroomNameInput.value = '';
-  }
-  */
+    if (chatroomName) {
+      const chatRoom = {
+        id: Date.now(),
+        name: chatroomName,
+        members: [currentUser.id],
+        messages: []
+      };
+      chatRooms.push(chatRoom);
+      saveChatRooms();
+      renderChatroomList();
+      chatroomNameInput.value = '';
+    }
+    */
+    // post request to rooms/
+    const url = `http://localhost:3000/rooms/${currentUser}`;
+    console.log(url);
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({
+            room: chatRoomName,
+        }),
+    });
+  
+    const statusCode = response.status;
+    console.log(statusCode);
+  
+    if (statusCode === 200) {
+        let responseId = await response.json();
+        console.log(responseId);
+        currentChatroom = {
+            id: responseId,
+            name: chatRoomName,
+            messages: [],
+        };
+        chatRooms.push(currentChatroom);
+        /*
+      message.innerHTML = 'Sign up Successfull';
+      await setTimeout(() => {
+        message.innerHTML = '';
+        showChatrooms();
+      }, '3000');
+      return;
+      */
+        alert('Chat room created successfully'); // just for now
+        //saveChatRooms();
+        renderChatroomList();
+        chatroomNameInput.value = '';
+        return;
+    }
+  
+    let responseMessage = await response.json();
+    alert(responseMessage.error); // just for now
+    /*
+    message.innerHTML = responseMessage.error
+    setTimeout(() => {
+        message.innerHTML = '';
+      }, '3000');
+      */
 }
-
 function handleJoinChatroom(event) {
     event.preventDefault();
     const chatroomId = event.target.dataset.chatroom;
-    console.log(typeof chatroomId);
-    currentChatroom = chatRooms.find((cr) => cr.id == +Number(chatroomId));
+    console.log(chatroomId);
+    console.log(chatRooms);
+    currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
+    console.log({works: currentChatroom});
+    const userId = currentUser;
+    socket.emit('new-user', chatroomId, userId);
     showMessages();
     renderMessageList();
 }
 
+socket.on('user-connected', (chatroomId, userId) => {
+    console.log('user-connected');
+    const message = {
+        userId: userId,//currentUser.id,
+        text: `${userId} connected`,
+    };
+    currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
+    currentChatroom.messages.push(message);
+    //showMessages();
+    renderMessageList();
+});
+
 function handleSendMessage(event) {
     event.preventDefault();
     const messageText = messageInput.value.trim();
+    if (!messageText) alert('Please enter a message');
+    /*
     if (messageText) {
         const message = {
             userId: currentUser.id,
@@ -261,7 +381,28 @@ function handleSendMessage(event) {
         renderMessageList();
         messageInput.value = '';
     }
+    */
+    const message = {
+        userId: 'You',
+        text: messageText,
+    };
+    currentChatroom.messages.push(message);
+    renderMessageList();
+    messageInput.value = '';
+    message.userId = currentUser;
+    socket.emit('send-chat-message', currentChatroom.id, message);
 }
+
+socket.on('chat-message', (chatroomId, message) => {
+    /*
+    for (let cr of chatRooms) {
+        if (cr.id === chatroomId) cr.messages.push(message);
+    }
+    */
+    console.log('chat-message');
+    currentChatroom.messages.push(message);
+    renderMessageList();
+});
 
 function init() {
     login.addEventListener('submit', handleLogin);

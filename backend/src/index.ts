@@ -34,7 +34,7 @@ if (dotenvResult.error) {
 const app: express.Application = express();
 //socket
 const httpServer = createServer(app);
-const io = new Server(httpServer, );
+const io = new Server(httpServer);
 //socket
 const port = 3000;
 const routes: Array<CommonRoutes> = [];
@@ -133,6 +133,18 @@ httpServer.listen(port, () => {
 //socket
 io.on('connection', (socket) => {
     console.log('user connected');
+
+    socket.on('new-user', (chatroomId, userId) => {
+        console.log('new-user');
+        socket.join(chatroomId);
+        //rooms[room].users[socket.id] = name
+        //socket.to(chatroomId).local.emit('user-connected', userId);
+        socket.broadcast.to(chatroomId).emit('user-connected', chatroomId, userId);
+    });
+
+    socket.on('send-chat-message', (chatroomId, message) => {
+        socket.broadcast.to(chatroomId).emit('chat-message', chatroomId, message);
+    });
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });

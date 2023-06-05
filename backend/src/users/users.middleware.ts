@@ -49,7 +49,7 @@ class UsersMiddleware {
             if (req.params.userId !== req.session._id) {
                 throw new Error('Not authorized');
             }
-            next();  
+            return next();  
         } catch (error: any) {
             error.status = 403;
             next(error);

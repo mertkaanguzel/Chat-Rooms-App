@@ -49,6 +49,17 @@ class UsersService {
             
         return { name: roomName };
     }
+
+    async getUserRooms(userId: string) {
+        const user =  await this.userModel.findOne({ _id: userId }).exec();
+        const rooms = user?.rooms.map(room => {
+            return {
+                _id: room._id.toString(),
+                name: room.name,
+            };
+        });
+        return rooms;
+    }
 }
 
 export default new UsersService();

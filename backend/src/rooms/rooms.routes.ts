@@ -13,11 +13,15 @@ export class RoomsRoutes extends CommonRoutes {
     }
 
     configureRoutes(): express.Application {
-        this.app.get('/room', (req, res) => {
-            res.send('Hello World');
-        });
+        this.app.route('/rooms/:userId')
+            .get(
+                UsersMiddleware.validateUserExists,
+                AuthMiddleware.validCookieNeeded,
+                UsersMiddleware.onlySameUserCanDoThisAction,
+                RoomsControllers.getRooms
+            );
         
-        this.app.route('/users/:userId')
+        this.app.route('/rooms/:userId')
             .post(
                 body('room').notEmpty().withMessage('room name missing').isString(),
                 BodyvalidationMiddleware.verifyBodyFieldsErrors,
