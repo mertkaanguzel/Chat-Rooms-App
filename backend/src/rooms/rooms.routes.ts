@@ -1,6 +1,6 @@
 import express from 'express';
 import { CommonRoutes } from '../common/common.routes';
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 import BodyvalidationMiddleware from '../common/bodyvalidation.middleware';
 import UsersMiddleware from '../users/users.middleware';
 //import UsersControllers from './users.controllers';
@@ -29,6 +29,16 @@ export class RoomsRoutes extends CommonRoutes {
                 AuthMiddleware.validCookieNeeded,
                 UsersMiddleware.onlySameUserCanDoThisAction,
                 RoomsControllers.addRoom
+            );
+
+        this.app.route('/rooms/:userId')
+            .put(
+                body('roomId').notEmpty().withMessage('roomId missing').isString(),
+                BodyvalidationMiddleware.verifyBodyFieldsErrors,
+                UsersMiddleware.validateUserExists,
+                AuthMiddleware.validCookieNeeded,
+                //UsersMiddleware.onlySameUserCanDoThisAction, ONLY ADMIN OF THE ROOM MIDDLEWARE
+                RoomsControllers.addUserToRoom
             );
         /*
         this.app

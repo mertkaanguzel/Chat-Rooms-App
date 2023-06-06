@@ -6,9 +6,11 @@ const messages = document.getElementById('messages');
 const chatroomList = document.getElementById('chatroom-list');
 const messageList = document.getElementById('message-list');
 const createChatroomForm = document.getElementById('create-chatroom-form');
-const sendMessageForm = document.getElementById('send-message-form');
 const chatroomNameInput = document.getElementById('chatroom-name');
+const sendMessageForm = document.getElementById('send-message-form');
 const messageInput = document.getElementById('message-input');
+const addUserForm = document.getElementById('add-user-form');
+const addUserInput = document.getElementById('add-user-input');
 const socket = io('http://localhost:3000');
 /*
 interface User {
@@ -127,6 +129,7 @@ function renderChatroomList() {
 
 function renderMessageList() {
     messageList.innerHTML = '';
+    if(!currentChatroom.messages) return;
     for (const message of currentChatroom.messages) {
         if (message.userId === currentUser) message.userId = 'You';
         const li = document.createElement('li');
@@ -309,10 +312,10 @@ async function handleCreateChatroom(event) {
     console.log(statusCode);
   
     if (statusCode === 200) {
-        let responseId = await response.json();
-        console.log(responseId);
+        let result = await response.json();
+        console.log(result);
         currentChatroom = {
-            id: responseId,
+            id: result.id.toString(),
             name: chatRoomName,
             messages: [],
         };
@@ -369,7 +372,10 @@ socket.on('user-connected', (chatroomId, userId) => {
 function handleSendMessage(event) {
     event.preventDefault();
     const messageText = messageInput.value.trim();
-    if (!messageText) alert('Please enter a message');
+    if (!messageText) {
+        alert('Please enter a message');
+        return;
+    }
     /*
     if (messageText) {
         const message = {
@@ -404,6 +410,36 @@ socket.on('chat-message', (chatroomId, message) => {
     renderMessageList();
 });
 
+async function handleAddUser(event) {
+    event.preventDefault();
+    const userInput = addUserInput.value.trim();
+    if (!userInput) {
+        alert('Please enter a user id');
+        return;
+    }
+    const url = `http://localhost:3000/rooms/${userInput}`;
+    console.log(url);
+    let response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({
+            roomId: currentChatroom.id,
+        }),
+    });
+  
+    const statusCode = response.status;
+
+    if (statusCode === 204) {
+        alert('User added to the room succesfully');
+        return;
+    }
+
+    const responseMessage = await response.json();
+    alert(responseMessage.error);
+}
+
 function init() {
     login.addEventListener('submit', handleLogin);
     signup.addEventListener('submit', handleSignup);
@@ -414,6 +450,7 @@ function init() {
         }
     });
     sendMessageForm.addEventListener('submit', handleSendMessage);
+    addUserForm.addEventListener('submit', handleAddUser);
     showLoginAndSignup();
 }
 

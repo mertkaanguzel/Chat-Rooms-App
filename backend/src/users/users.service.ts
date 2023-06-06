@@ -30,8 +30,8 @@ class UsersService {
             .exec();
     }
 
-    async updateUserRoom(roomName: string, userId: string) {
-        const user =  await this.userModel.findOne({ _id: userId }).exec();
+    async updateUserNewRoom(roomName: string, userId: string) {
+        //const user =  await this.userModel.findOne({ _id: userId }).exec();
         const room = new this.roomModel({
             name: roomName,
         });
@@ -47,7 +47,17 @@ class UsersService {
         )
             .exec();
             
-        return { name: roomName };
+        return { id: room._id };
+    }
+
+    async updateUserRoom(roomId: string, userId: string) {
+        const room = await this.roomModel.findOne({ _id: roomId }).exec();
+        await this.userModel.findByIdAndUpdate(userId,
+            { '$push': { 'rooms': room } },
+            { 'new': true, 'upsert': true },
+        )
+            .exec();
+            
     }
 
     async getUserRooms(userId: string) {
