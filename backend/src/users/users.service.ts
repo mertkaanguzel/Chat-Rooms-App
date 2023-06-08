@@ -20,7 +20,10 @@ class UsersService {
     }
 
     async getUserById(userId: string) {
-        return this.userModel.findOne({ _id: userId }).exec();
+        const user =  await this.userModel.findOne({ _id: userId }).exec();
+        if (!user) throw new Error('User does not exist'); 
+        return user;
+
     }
 
     async getUserByEmailWithPassword(email: string) {
@@ -31,15 +34,18 @@ class UsersService {
     }
 
     async updateUserNewRoom(roomName: string, userId: string) {
-        //const user =  await this.userModel.findOne({ _id: userId }).exec();
+        /*
         const room = new this.roomModel({
             name: roomName,
         });
-        await room.save();
-        /*
-        user?.rooms.push(room);
-        await user?.save();
         */
+        const room = new this.roomModel({
+            name: roomName,
+            createdBy: userId,
+            users: [userId],
+        });
+        await room.save();
+    
         
         await this.userModel.findByIdAndUpdate(userId,
             { '$push': { 'rooms': room } },
@@ -51,7 +57,13 @@ class UsersService {
     }
 
     async updateUserRoom(roomId: string, userId: string) {
-        const room = await this.roomModel.findOne({ _id: roomId }).exec();
+        //const room = await this.roomModel.findOne({ _id: roomId }).exec();
+        const room = await this.roomModel.findByIdAndUpdate(roomId,
+            { '$push': { 'users': userId } },
+            { 'new': true, 'upsert': true },
+        )
+            .exec();
+
         await this.userModel.findByIdAndUpdate(userId,
             { '$push': { 'rooms': room } },
             { 'new': true, 'upsert': true },
@@ -69,6 +81,29 @@ class UsersService {
             };
         });
         return rooms;
+    }
+
+    async deleteUserRoom(roomId: string) {
+        //const room = await this.roomModel.findOne({ _id: roomId }).exec();
+        await this.roomModel.deleteOne({ _id: roomId }).exec();
+        await this.userModel.updateMany(
+            {
+                'rooms._id' : { $in : [roomId] },
+            },
+            { $pull: { rooms: { _id: { $in : [roomId] } } } },
+        );
+
+    }
+
+    async getRoom(roomId: string) {
+        const room = await this.roomModel.findOne({ _id: roomId }).exec();
+        if (!room) throw new Error('Room does not exist');
+        return {
+            _id : room?._id,
+            name : room?.name,
+            createdBy : room?.createdBy,
+        };
+
     }
 }
 

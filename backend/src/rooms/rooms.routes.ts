@@ -6,6 +6,7 @@ import UsersMiddleware from '../users/users.middleware';
 //import UsersControllers from './users.controllers';
 import AuthMiddleware from '../auth/auth.middleware';
 import RoomsControllers from './rooms.controllers';
+import RoomsMiddleware from './rooms.middleware';
 
 export class RoomsRoutes extends CommonRoutes {
     constructor(app: express.Application) {
@@ -36,9 +37,21 @@ export class RoomsRoutes extends CommonRoutes {
                 body('roomId').notEmpty().withMessage('roomId missing').isString(),
                 BodyvalidationMiddleware.verifyBodyFieldsErrors,
                 UsersMiddleware.validateUserExists,
+                RoomsMiddleware.validateRoomExists,
                 AuthMiddleware.validCookieNeeded,
-                //UsersMiddleware.onlySameUserCanDoThisAction, ONLY ADMIN OF THE ROOM MIDDLEWARE
+                RoomsMiddleware.onlyRoomAdminCanDoThisAction,
                 RoomsControllers.addUserToRoom
+            );
+
+        this.app.route('/rooms')
+            .delete(
+                body('roomId').notEmpty().withMessage('roomId missing').isString(),
+                BodyvalidationMiddleware.verifyBodyFieldsErrors,
+                //UsersMiddleware.validateUserExists,
+                RoomsMiddleware.validateRoomExists,
+                AuthMiddleware.validCookieNeeded,
+                RoomsMiddleware.onlyRoomAdminCanDoThisAction,
+                RoomsControllers.deleteRoom
             );
         /*
         this.app

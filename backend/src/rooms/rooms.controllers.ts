@@ -34,6 +34,18 @@ class RoomsController {
         }
     }
 
+    async deleteRoom(req: express.Request, res: express.Response, next: express.NextFunction) {
+        try {
+            const roomId = req.body.roomId;
+            //const userId = req.params.userId;
+            await UsersService.deleteUserRoom(roomId);
+            return res.sendStatus(204);
+        } catch (error: any) {
+            error.status = 400;
+            next(error);
+        }
+    }
+
     async getRooms(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
             const userId = req.params.userId;
