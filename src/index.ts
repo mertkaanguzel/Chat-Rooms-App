@@ -134,19 +134,35 @@ httpServer.listen(port, () => {
 io.on('connection', (socket) => {
     console.log('user connected');
 
-    socket.on('new-user', (chatroomId, userId) => {
+    socket.on('new-user', (chatroomId, userId, socketId) => {
         console.log('new-user');
+        console.log('new-user', socketId);
         socket.join(chatroomId);
         //rooms[room].users[socket.id] = name
         //socket.to(chatroomId).local.emit('user-connected', userId);
-        socket.broadcast.to(chatroomId).emit('user-connected', chatroomId, userId);
+        socket.broadcast.to(chatroomId).emit('user-connected', chatroomId, userId, socketId);
     });
 
     socket.on('send-chat-message', (chatroomId, message) => {
         socket.broadcast.to(chatroomId).emit('chat-message', chatroomId, message);
     });
+
+    socket.on('disconnecting', () => {
+        for (const chatroomId of socket.rooms.keys()) {
+            console.log('1', chatroomId);
+            socket.broadcast.to(chatroomId).emit('user-disconnected', chatroomId, socket.id);
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
+        console.log('LIST OF ROOMS:', socket.id);
     });
+});
+io.of('/').adapter.on('create-room', (room) => {
+    console.log(`room ${room} was created`);
+});
+io.of('/').adapter.on('join-room', (room, id) => {
+    console.log(`socket ${id} has joined room ${room}`);
 });
 //socket

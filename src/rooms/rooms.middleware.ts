@@ -1,6 +1,6 @@
 import debug from 'debug';
 import express from 'express';
-import UsersService from '../users/users.service';
+import RoomsService from './rooms.service';
 
 const log: debug.IDebugger = debug('Rooms Middleware');
 
@@ -12,7 +12,7 @@ class RoomsMiddleware {
     ) {
         
         try {
-            const room = await UsersService.getRoom(req.body.roomId);
+            const room = res.locals.room;//await RoomsService.getRoom(req.body.roomId);
             if (room.createdBy.toString() !== req.session._id) {
                 throw new Error('Not authorized (only admin)');
             }
@@ -30,7 +30,7 @@ class RoomsMiddleware {
     ) {
       
         try {
-            const room = await UsersService.getRoom(req.body.roomId);
+            const room = await RoomsService.getRoom(req.body.roomId);
             if (!room) throw new Error('Room does not exist'); 
             res.locals.room = room;
             return next();

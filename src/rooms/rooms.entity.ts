@@ -1,19 +1,25 @@
 import debug from 'debug';
 import MongooseService from '../common/initdb';
 import { randomUUID } from 'crypto';
-import UsersEntity from '../users/users.entity';
 
 const log: debug.IDebugger = debug('Users Entity');
+
+export interface IRooms {
+    _id: typeof randomUUID;
+    name: string;
+    createdBy: typeof randomUUID;
+    users?: typeof randomUUID[];
+  }
 
 class RoomsEntity {
     Schema = MongooseService.getMongoose().Schema;
 
-    roomSchema = new this.Schema({
+    roomSchema = new this.Schema<IRooms>({
         _id: {
             type: 'UUID',
             default: () => randomUUID(),
         },
-        name: String,
+        name: { type: String, required: true },//String,
         createdBy: {
             type: 'UUID',
             ref: 'User',

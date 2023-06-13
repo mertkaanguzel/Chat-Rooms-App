@@ -7,7 +7,8 @@ import { CreateUserDto } from './create.user.dto';
 class UsersService {
     userModel = UsersEntity.User;
     roomModel = RoomsEntity.Room;
-    async createUser (userFields: CreateUserDto): Promise<any> {
+    
+    async createUser (userFields: CreateUserDto) {
         const user = new this.userModel({
             //_id: shortid.generate(),
             ...userFields,
@@ -15,7 +16,7 @@ class UsersService {
         await user.save();
     }
 
-    async getUserByEmail(email: string): Promise<any> {
+    async getUserByEmail(email: string) {
         return this.userModel.findOne({ email }).exec();
     }
 
@@ -33,46 +34,7 @@ class UsersService {
             .exec();
     }
 
-    async updateUserNewRoom(roomName: string, userId: string) {
-        /*
-        const room = new this.roomModel({
-            name: roomName,
-        });
-        */
-        const room = new this.roomModel({
-            name: roomName,
-            createdBy: userId,
-            users: [userId],
-        });
-        await room.save();
-    
-        
-        await this.userModel.findByIdAndUpdate(userId,
-            { '$push': { 'rooms': room } },
-            { 'new': true, 'upsert': true },
-        )
-            .exec();
-            
-        return { id: room._id };
-    }
-
-    async updateUserRoom(roomId: string, userId: string) {
-        //const room = await this.roomModel.findOne({ _id: roomId }).exec();
-        const room = await this.roomModel.findByIdAndUpdate(roomId,
-            { '$push': { 'users': userId } },
-            { 'new': true, 'upsert': true },
-        )
-            .exec();
-
-        await this.userModel.findByIdAndUpdate(userId,
-            { '$push': { 'rooms': room } },
-            { 'new': true, 'upsert': true },
-        )
-            .exec();
-            
-    }
-
-    async getUserRooms(userId: string) {
+    async getRoomsOfUser(userId: string) {
         const user =  await this.userModel.findOne({ _id: userId }).exec();
         const rooms = user?.rooms.map(room => {
             return {
@@ -81,29 +43,6 @@ class UsersService {
             };
         });
         return rooms;
-    }
-
-    async deleteUserRoom(roomId: string) {
-        //const room = await this.roomModel.findOne({ _id: roomId }).exec();
-        await this.roomModel.deleteOne({ _id: roomId }).exec();
-        await this.userModel.updateMany(
-            {
-                'rooms._id' : { $in : [roomId] },
-            },
-            { $pull: { rooms: { _id: { $in : [roomId] } } } },
-        );
-
-    }
-
-    async getRoom(roomId: string) {
-        const room = await this.roomModel.findOne({ _id: roomId }).exec();
-        if (!room) throw new Error('Room does not exist');
-        return {
-            _id : room?._id,
-            name : room?.name,
-            createdBy : room?.createdBy,
-        };
-
     }
 }
 

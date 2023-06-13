@@ -29,7 +29,7 @@ export class RoomsRoutes extends CommonRoutes {
                 UsersMiddleware.validateUserExists,
                 AuthMiddleware.validCookieNeeded,
                 UsersMiddleware.onlySameUserCanDoThisAction,
-                RoomsControllers.addRoom
+                RoomsControllers.createRoom
             );
 
         this.app.route('/rooms/:userId')
@@ -40,7 +40,7 @@ export class RoomsRoutes extends CommonRoutes {
                 RoomsMiddleware.validateRoomExists,
                 AuthMiddleware.validCookieNeeded,
                 RoomsMiddleware.onlyRoomAdminCanDoThisAction,
-                RoomsControllers.addUserToRoom
+                RoomsControllers.addRoomToUser
             );
 
         this.app.route('/rooms')

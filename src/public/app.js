@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const app = document.getElementById('app');
 const login = document.querySelector('#login');
 const signup = document.querySelector('#signup');
@@ -131,7 +132,7 @@ function renderMessageList() {
     messageList.innerHTML = '';
     if(!currentChatroom.messages) return;
     for (const message of currentChatroom.messages) {
-        if (message.userId === currentUser) message.userId = 'You';
+        if (message.userId === currentUser.id) message.userId = 'You';
         const li = document.createElement('li');
         //const user = users.find((u) => u.id === message.userId);
         //li.textContent = `${user.username}: ${message.text}`;
@@ -180,11 +181,15 @@ async function handleLogin(event) {
     if (statusCode === 200) {
         let responseId = await response.json();
         console.log(responseId);
-        currentUser = responseId?._id;
+        currentUser = {
+            id: responseId?._id,
+            name: '',
+            socketId: socket.id,
+        };
         users.push(currentUser);
         message.innerHTML = 'Login Successfull';
 
-        const url = `http://localhost:3000/rooms/${currentUser}`;
+        const url = `http://localhost:3000/rooms/${currentUser.id}`;
         console.log(url);
         let responseRooms = await fetch(url, {
             method: 'GET',
@@ -296,7 +301,7 @@ async function handleCreateChatroom(event) {
     }
     */
     // post request to rooms/
-    const url = `http://localhost:3000/rooms/${currentUser}`;
+    const url = `http://localhost:3000/rooms/${currentUser.id}`;
     console.log(url);
     let response = await fetch(url, {
         method: 'POST',
@@ -351,26 +356,47 @@ function handleJoinChatroom(event) {
     console.log(chatRooms);
     currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
     console.log({works: currentChatroom});
-    const userId = currentUser;
-    socket.emit('new-user', chatroomId, userId);
+    const userId = currentUser.id;
+    //socket.data.id = socket.id;
+    socket.emit('new-user', chatroomId, userId, socket.id);
     showMessages();
     renderMessageList();
 }
 
-socket.on('user-connected', (chatroomId, userId) => {
+socket.on('user-connected', (chatroomId, userId, socketId) => {
     console.log('user-connected');
+    //console.log('socketId' , socket.id);
+    const isCurrentRoom = currentChatroom.id === chatroomId;
+    console.log('isCurrentRoom' , isCurrentRoom);
+    //if(!roomFound) return;
+    const newUser = {
+        id: userId,
+        name: '',
+        socketId,
+    };
+    users.push(newUser);
     const message = {
         userId: userId,//currentUser.id,
         text: `${userId} connected`,
     };
-    currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
-    currentChatroom.messages.push(message);
-    //showMessages();
-    renderMessageList();
+    //currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
+    //currentChatroom.messages.push(message);
+    chatRooms.forEach((cr) => {
+        if (cr.id === chatroomId) {
+            cr.messages.push(message);
+        }
+    });
+    if(chatroomId === currentChatroom.id) renderMessageList();
+
+    //renderMessageList();
 });
 
 function handleSendMessage(event) {
     event.preventDefault();
+    console.log({
+        roomId: currentChatroom.id,
+        roomName: currentChatroom.name,
+    })
     const messageText = messageInput.value.trim();
     if (!messageText) {
         alert('Please enter a message');
@@ -395,7 +421,7 @@ function handleSendMessage(event) {
     currentChatroom.messages.push(message);
     renderMessageList();
     messageInput.value = '';
-    message.userId = currentUser;
+    message.userId = currentUser.id;
     socket.emit('send-chat-message', currentChatroom.id, message);
 }
 
@@ -406,8 +432,14 @@ socket.on('chat-message', (chatroomId, message) => {
     }
     */
     console.log('chat-message');
-    currentChatroom.messages.push(message);
-    renderMessageList();
+    //currentChatroom.messages.push(message);
+    //cchatRooms.find((cr) => cr.id === chatroomId);
+    chatRooms.forEach((cr) => {
+        if (cr.id === chatroomId) {
+            cr.messages.push(message);
+        }
+    });
+    if(chatroomId === currentChatroom.id) renderMessageList();
 });
 
 async function handleAddUser(event) {
@@ -439,6 +471,26 @@ async function handleAddUser(event) {
     const responseMessage = await response.json();
     alert(responseMessage.error);
 }
+
+socket.on('user-disconnected', (chatroomId, socketId) => {
+    console.log('user-disconnected');
+    const disconnectedUser =  users.find((user) => user.socketId === socketId);
+    const message = {
+        userId: disconnectedUser.id,//currentUser.id,
+        text: `${disconnectedUser.id} disconnected`,
+    };
+    /*
+    currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
+    currentChatroom.messages.push(message);
+    renderMessageList();
+    */
+    chatRooms.forEach((cr) => {
+        if (cr.id === chatroomId) {
+            cr.messages.push(message);
+        }
+    });
+    if(chatroomId === currentChatroom.id) renderMessageList();
+});
 
 function init() {
     login.addEventListener('submit', handleLogin);
