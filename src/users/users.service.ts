@@ -36,7 +36,7 @@ class UsersService {
 
     async getRoomsOfUser(userId: string) {
         const user =  await this.userModel.findOne({ _id: userId }).exec();
-        const rooms = user?.rooms.map(room => {
+        const rooms = user?.rooms?.map(room => {
             return {
                 _id: room._id.toString(),
                 name: room.name,

@@ -5,7 +5,7 @@ import BodyvalidationMiddleware from '../common/bodyvalidation.middleware';
 import UsersMiddleware from '../users/users.middleware';
 //import UsersControllers from './users.controllers';
 import AuthMiddleware from '../auth/auth.middleware';
-import RoomsControllers from './rooms.controllers';
+import RoomsControllers from './rooms.controller';
 import RoomsMiddleware from './rooms.middleware';
 
 export class RoomsRoutes extends CommonRoutes {

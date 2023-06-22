@@ -1,7 +1,8 @@
 import UsersEntity from '../users/users.entity';
 import RoomsEntity from './rooms.entity';
 import { IRooms } from './rooms.entity' ;
-class UsersService {
+
+class RoomsService {
     UserModel = UsersEntity.User;
     RoomModel = RoomsEntity.Room;
 
@@ -79,4 +80,4 @@ class UsersService {
     }
 }
 
-export default new UsersService();
+export default new RoomsService();

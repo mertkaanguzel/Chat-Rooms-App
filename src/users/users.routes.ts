@@ -3,7 +3,7 @@ import { CommonRoutes } from '../common/common.routes';
 import { body } from 'express-validator';
 import BodyvalidationMiddleware from '../common/bodyvalidation.middleware';
 import UsersMiddleware from './users.middleware';
-import UsersControllers from './users.controllers';
+import UsersControllers from './users.controller';
 import AuthMiddleware from '../auth/auth.middleware';
 
 export class UsersRoutes extends CommonRoutes {

@@ -27,7 +27,7 @@ class UsersEntity {
         password: { type: String, select: false, required: true },
         firstName: String,
         lastName: String,
-        rooms: [roomsEntity.roomSchema],
+        rooms: [new this.Schema(roomsEntity.roomSchema)],
         //permissionFlags: Number,
     }, { id: false });
 
