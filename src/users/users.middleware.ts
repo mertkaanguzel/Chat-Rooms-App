@@ -13,11 +13,11 @@ class UsersMiddleware {
         try {
             const user = await UsersService.getUserByEmail(req.body.email);
             if (user) throw new Error('Email already in use');
+            return next();
         } catch (error: any) {
             error.status = 400;
             next(error);
         }
-        return next();
     }
 
     async validateUserExists(

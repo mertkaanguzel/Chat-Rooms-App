@@ -31,7 +31,7 @@ class RoomsMiddleware {
       
         try {
             const room = await RoomsService.getRoom(req.body.roomId);
-            if (!room) throw new Error('Room does not exist'); 
+            if (!room) throw new Error('Room does not exist');
             res.locals.room = room;
             return next();
           

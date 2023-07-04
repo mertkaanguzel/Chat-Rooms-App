@@ -31,7 +31,7 @@ if (dotenvResult.error) {
     throw dotenvResult.error;
 }
 
-const app: express.Application = express();
+export const app: express.Application = express();
 //socket
 const httpServer = createServer(app);
 const io = new Server(httpServer);
