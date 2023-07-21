@@ -492,7 +492,8 @@ socket.on('user-disconnected', (chatroomId, socketId) => {
     if(chatroomId === currentChatroom.id) renderMessageList();
 });
 
-function init() {
+async function init() {
+    const isSuccess = await handleStartup();
     login.addEventListener('submit', handleLogin);
     signup.addEventListener('submit', handleSignup);
     createChatroomForm.addEventListener('submit', handleCreateChatroom);
@@ -503,7 +504,59 @@ function init() {
     });
     sendMessageForm.addEventListener('submit', handleSendMessage);
     addUserForm.addEventListener('submit', handleAddUser);
-    showLoginAndSignup();
+    if (isSuccess) {
+        showChatrooms(); //before that fetch users rooms
+        renderChatroomList();
+    } else {
+        showLoginAndSignup();
+    }
 }
 
 init();
+
+async function handleStartup() {
+    let isSuccess = false;
+ 
+    const url = 'http://localhost:3000/userId';
+
+    let response = await fetch(url, {
+        method: 'GET',
+    });
+
+    const statusCode = response.status;
+
+    if (statusCode === 200) {
+        let responseId = await response.json();
+        console.log(responseId);
+        currentUser = {
+            id: responseId?._id,
+            name: '',
+            socketId: socket.id,
+        };
+        users.push(currentUser);
+
+        const url = `http://localhost:3000/rooms/${currentUser.id}`;
+        let responseRooms = await fetch(url, {
+            method: 'GET',
+        });
+
+        if (responseRooms.status === 200) {
+            let roomsArray = await responseRooms.json();
+            console.log('hey');
+            console.log(roomsArray);
+            roomsArray.forEach(room => {
+                chatRooms.push({
+                    id: room._id,
+                    name: room.name,
+                    messages: [],
+
+                });
+            });
+
+            isSuccess = true;
+        }
+      
+        return isSuccess;
+        
+    }
+}

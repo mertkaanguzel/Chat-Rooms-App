@@ -29,6 +29,16 @@ class UsersController {
             next(error);
         }
     }
+
+    async getUserId(req: express.Request, res: express.Response, next: express.NextFunction) {
+        try {
+            const id = { _id: req.session._id};
+            return res.status(200).send(JSON.stringify(id));
+        } catch (error: any) {
+            error.status = 400;
+            next(error);
+        }
+    }
 }
 
 export default new UsersController();

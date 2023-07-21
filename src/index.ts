@@ -1,7 +1,8 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import * as dotenv from 'dotenv';
+import dotenv from 'dotenv';
+dotenv.config();
 import cors from 'cors';
 
 import * as winston from 'winston';
@@ -55,7 +56,7 @@ const loggerOpts: expressWinston.LoggerOptions = {
     ),
 };
 
-if (!process.env.DEBUG) {
+if (String(process.env.STAGE) !== 'DEV') {
     loggerOpts.meta = false;
 }
 
@@ -78,7 +79,7 @@ app.use(
     session({
         store: redisStore,
         saveUninitialized: false,
-        secret: 'topSecret',
+        secret: String(process.env.SESSION_SECRET),
         resave: false,
         name: 'sessionId',
         cookie: {

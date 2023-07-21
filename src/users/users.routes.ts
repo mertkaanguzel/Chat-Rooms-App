@@ -34,6 +34,12 @@ export class UsersRoutes extends CommonRoutes {
                 //PermissionMiddleware.onlySameUserOrAdminCanDoThisAction
             )
             .get(UsersControllers.getUserById);
+        
+        this.app.route('/userId')
+            .get(
+                AuthMiddleware.validCookieNeeded,
+                UsersControllers.getUserId,
+            );
 
         return this.app;
     }
