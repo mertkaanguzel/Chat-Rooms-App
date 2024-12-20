@@ -6,7 +6,6 @@ COPY package* ./
 COPY tsconfig.json ./
 COPY .eslintrc.json ./
 COPY jest.config.js ./
-COPY .env ./
 
 ENV CACHE_URL=redis://redis:6379
 ENV PORT=3000
