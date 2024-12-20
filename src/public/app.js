@@ -12,7 +12,8 @@ const messageInput = document.getElementById('message-input');
 const addUserForm = document.getElementById('add-user-form');
 const addUserInput = document.getElementById('add-user-input');
 const logoutForm = document.getElementById('logout-form');
-const socket = io('http://localhost:3000');
+const HostUrl = 'https://chat-rooms-app-production.up.railway.app';
+const socket = io(HostUrl);
 
 let users = [];
 let currentUser = null;
@@ -91,7 +92,7 @@ async function handleLogin(event) {
     const email = login.querySelector('#email').value;
     const password = login.querySelector('#password').value;
     const message = login.querySelector('#message');
-    const url = 'http://localhost:3000/auth';
+    const url = `${HostUrl}/auth`;
 
     let response = await fetch(url, {
         method: 'POST',
@@ -116,7 +117,7 @@ async function handleLogin(event) {
         users.push(currentUser);
         message.innerHTML = 'Login Successfull';
 
-        const url = `http://localhost:3000/rooms/${currentUser.id}`;
+        const url = `${HostUrl}/${currentUser.id}`;
         let responseRooms = await fetch(url, {
             method: 'GET',
         });
@@ -162,7 +163,7 @@ async function handleSignup(event) {
     const email = signup.querySelector('#email').value;
     const password = signup.querySelector('#password').value;
     const message = signup.querySelector('#message');
-    const url = 'http://localhost:3000/users';
+    const url = `${HostUrl}/users`;
 
     let response = await fetch(url, {
         method: 'POST',
@@ -202,7 +203,7 @@ async function handleCreateChatroom(event) {
         return;
     }
 
-    const url = `http://localhost:3000/rooms/${currentUser.id}`;
+    const url = `${HostUrl}/${currentUser.id}`;
     let response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -299,7 +300,7 @@ async function handleAddUser(event) {
         alert('Please enter a user id');
         return;
     }
-    const url = `http://localhost:3000/rooms/${userInput}`;
+    const url = `${HostUrl}/${userInput}`;
     let response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -361,7 +362,7 @@ init();
 async function handleStartup() {
     let isSuccess = false;
  
-    const url = 'http://localhost:3000/userId';
+    const url = `${HostUrl}/userId`;
 
     let response = await fetch(url, {
         method: 'GET',
@@ -378,7 +379,7 @@ async function handleStartup() {
         };
         users.push(currentUser);
 
-        const url = `http://localhost:3000/rooms/${currentUser.id}`;
+        const url = `${HostUrl}/${currentUser.id}`;
         let responseRooms = await fetch(url, {
             method: 'GET',
         });
@@ -404,7 +405,7 @@ async function handleStartup() {
 
 async function handleLogout(event) {
     event.preventDefault();
-    const url = 'http://localhost:3000/logout';
+    const url = `${HostUrl}/logout`;
 
     let response = await fetch(url, {
         method: 'POST',
