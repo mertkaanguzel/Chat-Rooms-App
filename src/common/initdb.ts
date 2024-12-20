@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import debug from 'debug';
 
+import dotenv from 'dotenv';
+dotenv.config();
 const log: debug.IDebugger = debug('app:mongoose-service');
 
 class MongooseService {

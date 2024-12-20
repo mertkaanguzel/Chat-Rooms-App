@@ -2,9 +2,10 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 /*
-import dotenv from 'dotenv';
-dotenv.config();
+import * as dotenv from "dotenv";
+dotenv.config({ path: __dirname+'/.env' });
 */
+
 import cors from 'cors';
 import MongooseService from './common/initdb';
 
@@ -45,7 +46,7 @@ const io = require("socket.io")(httpServer, {
     }
   });
 //socket
-const port = 3000;
+const port = process.env.PORT;
 const routes: Array<CommonRoutes> = [];
 const debugLog: debug.IDebugger = debug('app');
 
@@ -79,17 +80,21 @@ app.use(expressWinston.logger(loggerOpts));
 
 // Initialize client.
 const redisClient = createClient({
-    username: process.env.CACHE_USERNAME,
-    password: process.env.CACHE_PASSWORD,
+    username: String(process.env.CACHE_USERNAME),
+    password: String(process.env.CACHE_PASSWORD),
     socket: {
-        host: process.env.CACHE_URL,
-        port: process.env.CACHE_PORT,
+        host: String(process.env.CACHE_URL),
+        port: Number(process.env.CACHE_PORT),
     }
   });
 
 redisClient.connect().catch(console.error);
 
 // Initialize store.
+const redisStore = new RedisStore({
+    client: redisClient,
+});
+
 
 
 app.set('trust proxy', (ip) => {
