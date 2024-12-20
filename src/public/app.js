@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const app = document.getElementById('app');
 const login = document.querySelector('#login');
 const signup = document.querySelector('#signup');
@@ -14,52 +13,6 @@ const addUserForm = document.getElementById('add-user-form');
 const addUserInput = document.getElementById('add-user-input');
 const logoutForm = document.getElementById('logout-form');
 const socket = io('http://localhost:3000');
-/*
-interface User {
-  id: number;
-  username: string;
-  password: string;
-}
-
-interface ChatRoom {
-  id: number;
-  name: string;
-  members: number[];
-  messages: Message[];
-}
-
-interface Message {
-  userId: number;
-  text: string;
-}
-*/
-/*
-let users = [
-  {
-    id: 123,
-    username: 'user123',
-    password: '123',
-  },
-];
-
-let currentUser = users[0];
-
-let chatRooms = [
-  {
-    id: 123,
-    name: 'chatroom1',
-    members: [123],
-    messages: [
-      {
-        userId: 123,
-        text: 'Hello World',
-      },
-    ],
-  },
-];
-
-let currentChatroom = chatRooms[0];
-*/
 
 let users = [];
 let currentUser = null;
@@ -114,16 +67,6 @@ function showMessages() {
 
 function renderChatroomList() {
     chatroomList.innerHTML = '';
-    /*
-    for (const chatRoom of chatRooms) {
-      if (chatRoom.members.includes(currentUser.id)) {
-        const li = document.createElement('li');
-        li.textContent = chatRoom.name;
-        li.dataset.chatroom = chatRoom.id;
-        chatroomList.appendChild(li);
-      }
-    }
-    */
     for (const chatRoom of chatRooms) {
         const li = document.createElement('li');
         li.textContent = chatRoom.name;
@@ -138,18 +81,9 @@ function renderMessageList() {
     for (const message of currentChatroom.messages) {
         if (message.userId === currentUser.id) message.userId = 'You';
         const li = document.createElement('li');
-        //const user = users.find((u) => u.id === message.userId);
-        //li.textContent = `${user.username}: ${message.text}`;
         li.textContent = `${message.userId}: ${message.text}`;
         messageList.appendChild(li);
     }
-    /*
-    const message =  currentChatroom.messages.slice(-1);
-    console.log(message);
-    const li = document.createElement('li');
-    li.textContent = `${message.userId}: ${message.text}`;
-    messageList.appendChild(li);
-    */
 }
 
 async function handleLogin(event) {
@@ -157,16 +91,6 @@ async function handleLogin(event) {
     const email = login.querySelector('#email').value;
     const password = login.querySelector('#password').value;
     const message = login.querySelector('#message');
-    /*
-  const user = users.find((u) => u.username === username && u.password === password);
-  if (user) {
-    currentUser = user;
-    showChatrooms();
-    renderChatroomList();
-  } else {
-    alert('Invalid username or password.');
-  }
-  */
     const url = 'http://localhost:3000/auth';
 
     let response = await fetch(url, {
@@ -184,7 +108,6 @@ async function handleLogin(event) {
 
     if (statusCode === 200) {
         let responseId = await response.json();
-        console.log(responseId);
         currentUser = {
             id: responseId?._id,
             name: '',
@@ -194,15 +117,11 @@ async function handleLogin(event) {
         message.innerHTML = 'Login Successfull';
 
         const url = `http://localhost:3000/rooms/${currentUser.id}`;
-        console.log(url);
         let responseRooms = await fetch(url, {
             method: 'GET',
         });
-        console.log(responseRooms.status);
         if (responseRooms.status === 200) {
             let roomsArray = await responseRooms.json();
-            console.log('hey');
-            console.log(roomsArray);
             roomsArray.forEach(room => {
                 chatRooms.push({
                     id: room._id,
@@ -211,28 +130,21 @@ async function handleLogin(event) {
 
                 });
             });
-            /*
-          message.innerHTML = 'Sign up Successfull';
-          await setTimeout(() => {
-            message.innerHTML = '';
+
+            alert('Chat rooms listed successfully'); 
             showChatrooms();
-          }, '3000');
-          return;
-          */
-            alert('Chat rooms listed successfully'); // just for now
-            showChatrooms(); //before that fetch users rooms
             renderChatroomList();
             return;
         }
       
         let responseRoomsMessage = await responseRooms.json();
-        alert(responseRoomsMessage.error); // just for now
+        alert(responseRoomsMessage.error);
 
 
 
         await setTimeout(() => {
             message.innerHTML = '';
-            showChatrooms(); //before that fetch users rooms
+            showChatrooms();
             renderChatroomList();
         }, '3000');
         return;
@@ -289,24 +201,8 @@ async function handleCreateChatroom(event) {
         alert('Please enter a room name');
         return;
     }
-    
-    /*
-    if (chatroomName) {
-      const chatRoom = {
-        id: Date.now(),
-        name: chatroomName,
-        members: [currentUser.id],
-        messages: []
-      };
-      chatRooms.push(chatRoom);
-      saveChatRooms();
-      renderChatroomList();
-      chatroomNameInput.value = '';
-    }
-    */
-    // post request to rooms/
+
     const url = `http://localhost:3000/rooms/${currentUser.id}`;
-    console.log(url);
     let response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -318,61 +214,37 @@ async function handleCreateChatroom(event) {
     });
   
     const statusCode = response.status;
-    console.log(statusCode);
   
     if (statusCode === 200) {
         let result = await response.json();
-        console.log(result);
         currentChatroom = {
             id: result.id.toString(),
             name: chatRoomName,
             messages: [],
         };
         chatRooms.push(currentChatroom);
-        /*
-      message.innerHTML = 'Sign up Successfull';
-      await setTimeout(() => {
-        message.innerHTML = '';
-        showChatrooms();
-      }, '3000');
-      return;
-      */
-        alert('Chat room created successfully'); // just for now
-        //saveChatRooms();
+
+        alert('Chat room created successfully');
         renderChatroomList();
         chatroomNameInput.value = '';
         return;
     }
   
     let responseMessage = await response.json();
-    alert(responseMessage.error); // just for now
-    /*
-    message.innerHTML = responseMessage.error
-    setTimeout(() => {
-        message.innerHTML = '';
-      }, '3000');
-      */
+    alert(responseMessage.error);
 }
 function handleJoinChatroom(event) {
     event.preventDefault();
     const chatroomId = event.target.dataset.chatroom;
-    console.log(chatroomId);
-    console.log(chatRooms);
     currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
-    console.log({works: currentChatroom});
     const userId = currentUser.id;
-    //socket.data.id = socket.id;
     socket.emit('new-user', chatroomId, userId, socket.id);
     showMessages();
     renderMessageList();
 }
 
 socket.on('user-connected', (chatroomId, userId, socketId) => {
-    console.log('user-connected');
-    //console.log('socketId' , socket.id);
     const isCurrentRoom = currentChatroom.id === chatroomId;
-    console.log('isCurrentRoom' , isCurrentRoom);
-    //if(!roomFound) return;
     const newUser = {
         id: userId,
         name: '',
@@ -380,11 +252,9 @@ socket.on('user-connected', (chatroomId, userId, socketId) => {
     };
     users.push(newUser);
     const message = {
-        userId: userId,//currentUser.id,
+        userId: userId,
         text: `${userId} connected`,
     };
-    //currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
-    //currentChatroom.messages.push(message);
     chatRooms.forEach((cr) => {
         if (cr.id === chatroomId) {
             cr.messages.push(message);
@@ -397,27 +267,11 @@ socket.on('user-connected', (chatroomId, userId, socketId) => {
 
 function handleSendMessage(event) {
     event.preventDefault();
-    console.log({
-        roomId: currentChatroom.id,
-        roomName: currentChatroom.name,
-    });
     const messageText = messageInput.value.trim();
     if (!messageText) {
         alert('Please enter a message');
         return;
     }
-    /*
-    if (messageText) {
-        const message = {
-            userId: currentUser.id,
-            text: messageText,
-        };
-        currentChatroom.messages.push(message);
-        saveChatRooms();
-        renderMessageList();
-        messageInput.value = '';
-    }
-    */
     const message = {
         userId: 'You',
         text: messageText,
@@ -430,14 +284,6 @@ function handleSendMessage(event) {
 }
 
 socket.on('chat-message', (chatroomId, message) => {
-    /*
-    for (let cr of chatRooms) {
-        if (cr.id === chatroomId) cr.messages.push(message);
-    }
-    */
-    console.log('chat-message');
-    //currentChatroom.messages.push(message);
-    //cchatRooms.find((cr) => cr.id === chatroomId);
     chatRooms.forEach((cr) => {
         if (cr.id === chatroomId) {
             cr.messages.push(message);
@@ -454,7 +300,6 @@ async function handleAddUser(event) {
         return;
     }
     const url = `http://localhost:3000/rooms/${userInput}`;
-    console.log(url);
     let response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -477,17 +322,11 @@ async function handleAddUser(event) {
 }
 
 socket.on('user-disconnected', (chatroomId, socketId) => {
-    console.log('user-disconnected');
     const disconnectedUser =  users.find((user) => user.socketId === socketId);
     const message = {
         userId: disconnectedUser.id,//currentUser.id,
         text: `${disconnectedUser.id} disconnected`,
     };
-    /*
-    currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
-    currentChatroom.messages.push(message);
-    renderMessageList();
-    */
     chatRooms.forEach((cr) => {
         if (cr.id === chatroomId) {
             cr.messages.push(message);
@@ -510,7 +349,7 @@ async function init() {
     sendMessageForm.addEventListener('submit', handleSendMessage);
     addUserForm.addEventListener('submit', handleAddUser);
     if (isSuccess) {
-        showChatrooms(); //before that fetch users rooms
+        showChatrooms();
         renderChatroomList();
     } else {
         showLoginAndSignup();
@@ -532,7 +371,6 @@ async function handleStartup() {
 
     if (statusCode === 200) {
         let responseId = await response.json();
-        console.log(responseId);
         currentUser = {
             id: responseId?._id,
             name: '',
@@ -547,8 +385,6 @@ async function handleStartup() {
 
         if (responseRooms.status === 200) {
             let roomsArray = await responseRooms.json();
-            console.log('hey');
-            console.log(roomsArray);
             roomsArray.forEach(room => {
                 chatRooms.push({
                     id: room._id,
@@ -568,7 +404,6 @@ async function handleStartup() {
 
 async function handleLogout(event) {
     event.preventDefault();
-    console.log('handle logout');
     const url = 'http://localhost:3000/logout';
 
     let response = await fetch(url, {
@@ -579,7 +414,6 @@ async function handleLogout(event) {
 
     if (statusCode === 204) {
         alert('Logout successful');
-        //location.reload();
         init();
         return;
     }
@@ -587,5 +421,4 @@ async function handleLogout(event) {
 
     const responseMessage = await response.json();
     alert(responseMessage.error);
-    
 }
