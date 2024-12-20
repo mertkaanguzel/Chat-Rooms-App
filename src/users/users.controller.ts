@@ -39,6 +39,17 @@ class UsersController {
             next(error);
         }
     }
+
+    async logOut(req: express.Request, res: express.Response, next: express.NextFunction) {
+        try {
+            req.session.destroy(_error => {
+                return res.sendStatus(204);
+            });
+        } catch (error: any) {
+            error.status = 400;
+            next(error);
+        }
+    }
 }
 
 export default new UsersController();

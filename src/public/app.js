@@ -12,6 +12,7 @@ const sendMessageForm = document.getElementById('send-message-form');
 const messageInput = document.getElementById('message-input');
 const addUserForm = document.getElementById('add-user-form');
 const addUserInput = document.getElementById('add-user-input');
+const logoutForm = document.getElementById('logout-form');
 const socket = io('http://localhost:3000');
 /*
 interface User {
@@ -92,6 +93,7 @@ function showLoginAndSignup() {
     signup.style.display = 'block';
     chatrooms.style.display = 'none';
     messages.style.display = 'none';
+    logoutForm.style.display = 'none';
 }
 
 function showChatrooms() {
@@ -99,6 +101,7 @@ function showChatrooms() {
     signup.style.display = 'none';
     chatrooms.style.display = 'block';
     messages.style.display = 'none';
+    logoutForm.style.display = 'block';
 }
 
 function showMessages() {
@@ -106,6 +109,7 @@ function showMessages() {
     signup.style.display = 'none';
     chatrooms.style.display = 'block';
     messages.style.display = 'block';
+    logoutForm.style.display = 'block';
 }
 
 function renderChatroomList() {
@@ -396,7 +400,7 @@ function handleSendMessage(event) {
     console.log({
         roomId: currentChatroom.id,
         roomName: currentChatroom.name,
-    })
+    });
     const messageText = messageInput.value.trim();
     if (!messageText) {
         alert('Please enter a message');
@@ -496,6 +500,7 @@ async function init() {
     const isSuccess = await handleStartup();
     login.addEventListener('submit', handleLogin);
     signup.addEventListener('submit', handleSignup);
+    logoutForm.addEventListener('submit', handleLogout);
     createChatroomForm.addEventListener('submit', handleCreateChatroom);
     chatroomList.addEventListener('click', (event) => {
         if (event.target.nodeName === 'LI') {
@@ -559,4 +564,28 @@ async function handleStartup() {
         return isSuccess;
         
     }
+}
+
+async function handleLogout(event) {
+    event.preventDefault();
+    console.log('handle logout');
+    const url = 'http://localhost:3000/logout';
+
+    let response = await fetch(url, {
+        method: 'POST',
+    });
+  
+    const statusCode = response.status;
+
+    if (statusCode === 204) {
+        alert('Logout successful');
+        //location.reload();
+        init();
+        return;
+    }
+
+
+    const responseMessage = await response.json();
+    alert(responseMessage.error);
+    
 }

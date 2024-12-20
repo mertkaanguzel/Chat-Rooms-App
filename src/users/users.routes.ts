@@ -41,6 +41,12 @@ export class UsersRoutes extends CommonRoutes {
                 UsersControllers.getUserId,
             );
 
+        this.app.route('/logout')
+            .post(
+                AuthMiddleware.validCookieNeeded,
+                UsersControllers.logOut,
+            );
+
         return this.app;
     }
 }

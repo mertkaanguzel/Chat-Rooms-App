@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 dotenv.config();
 import cors from 'cors';
+import MongooseService from './common/initdb';
 
 import * as winston from 'winston';
 import * as expressWinston from 'express-winston';
@@ -65,7 +66,9 @@ app.use(expressWinston.logger(loggerOpts));
 //app.set('trust proxy', 1);
 
 // Initialize client.
-const redisClient = createClient();
+const redisClient = createClient({
+    url: String(process.env.CACHE_URL)
+  });
 
 redisClient.connect().catch(console.error);
 
@@ -123,6 +126,7 @@ app.listen(port, () => {
 */
 //socket
 httpServer.listen(port, () => {
+    MongooseService.connectWithRetry();
     routes.forEach((route: CommonRoutes) => {
         debugLog(`Routes configured for ${route.getName()}`);
     });

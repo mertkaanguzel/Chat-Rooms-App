@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  chatroom:
+    build: .
+    command: npm run dev
+    ports: 
+      - 3000:3000
+    volumes:
+      - ./:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+    depends_on:
+      - redis
+      - mongo
+    container_name: backend
+  redis:
+    image: redis
+    container_name: cache
+    restart: unless-stopped
+  mongo:
+    image: mongo
+    environment:
+      - MONGO_INITDB_DATABASE=chatroomsdb
+    container_name: db
+    restart: unless-stopped
+
+
+volumes:
+  node_modules:
