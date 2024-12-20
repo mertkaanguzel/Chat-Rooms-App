@@ -117,7 +117,7 @@ async function handleLogin(event) {
         users.push(currentUser);
         message.innerHTML = 'Login Successfull';
 
-        const url = `${HostUrl}/${currentUser.id}`;
+        const url = `${HostUrl}/rooms/${currentUser.id}`;
         let responseRooms = await fetch(url, {
             method: 'GET',
         });
@@ -203,7 +203,7 @@ async function handleCreateChatroom(event) {
         return;
     }
 
-    const url = `${HostUrl}/${currentUser.id}`;
+    const url = `${HostUrl}/rooms/${currentUser.id}`;
     let response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -300,7 +300,7 @@ async function handleAddUser(event) {
         alert('Please enter a user id');
         return;
     }
-    const url = `${HostUrl}/${userInput}`;
+    const url = `${HostUrl}/rooms/${userInput}`;
     let response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -379,7 +379,7 @@ async function handleStartup() {
         };
         users.push(currentUser);
 
-        const url = `${HostUrl}/${currentUser.id}`;
+        const url = `${HostUrl}/rooms/${currentUser.id}`;
         let responseRooms = await fetch(url, {
             method: 'GET',
         });
