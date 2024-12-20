@@ -79,15 +79,18 @@ app.use(expressWinston.logger(loggerOpts));
 
 // Initialize client.
 const redisClient = createClient({
-    url: String(process.env.CACHE_URL)
+    username: process.env.CACHE_USERNAME,
+    password: process.env.CACHE_PASSWORD,
+    socket: {
+        host: process.env.CACHE_URL,
+        port: process.env.CACHE_PORT,
+    }
   });
 
 redisClient.connect().catch(console.error);
 
 // Initialize store.
-const redisStore = new RedisStore({
-    client: redisClient,
-});
+
 
 app.set('trust proxy', (ip) => {
     if (ip === '127.0.0.1' || ip === '123.123.123.123') return true // trusted IPs
