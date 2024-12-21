@@ -240,6 +240,9 @@ function handleJoinChatroom(event) {
     currentChatroom = chatRooms.find((cr) => cr.id === chatroomId);
     const userId = currentUser.id;
     socket.emit('new-user', chatroomId, userId, socket.id);
+    const idNode = document.createElement("h3");
+    idNode.innerText = `Your Id: ${userId} . You can share it to join other rooms.`;
+    messages.appendChild(idNode);
     showMessages();
     renderMessageList();
 }
