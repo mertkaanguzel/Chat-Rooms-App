@@ -41,7 +41,7 @@ app.use(express.urlencoded({extended : true}));
 
 let corsOptions = {
     credentials: true,
-    origin: 'https://chat-rooms-app-production.up.railway.app',
+    origin: 'https://chat-rooms-app-nwnb.onrender.com',
  }
  app.use(cors(corsOptions))
 
