@@ -12,7 +12,7 @@ const messageInput = document.getElementById('message-input');
 const addUserForm = document.getElementById('add-user-form');
 const addUserInput = document.getElementById('add-user-input');
 const logoutForm = document.getElementById('logout-form');
-const HostUrl = 'https://chat-rooms-app-production.up.railway.app';
+const HostUrl = 'https://chat-rooms-app-nwnb.onrender.com';
 const socket = io(HostUrl);
 
 let users = [];
