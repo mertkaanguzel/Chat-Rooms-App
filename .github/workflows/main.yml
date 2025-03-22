@@ -36,3 +36,12 @@ jobs:
           push: true
           tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
           file: ./Dockerfile
+          build-args: |
+            CACHE_URL=${{ secrets.CACHE_URL }}
+            CACHE_PORT=${{ secrets.CACHE_PORT }}
+            CACHE_USERNAME=${{ secrets.CACHE_USERNAME }}
+            CACHE_PASSWORD=${{ secrets.CACHE_PASSWORD }}
+            PORT=${{ secrets.PORT }}
+            STAGE=${{ secrets.STAGE }}
+            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            DB_URL=${{ secrets.DB_URL }} 
