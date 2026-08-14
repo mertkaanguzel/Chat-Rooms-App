@@ -1,6 +1,7 @@
 import express from 'express';
 import UsersService from '../users/users.service';
 import bcrypt from 'bcrypt';
+import { withStatus } from '../common/http-error';
 
 class AuthMiddleware {
 
@@ -10,7 +11,7 @@ class AuthMiddleware {
         next: express.NextFunction
     ) {
         try {
-            const user: any = await UsersService.getUserByEmailWithPassword(
+            const user = await UsersService.getUserByEmailWithPassword(
                 req.body.email
             );
             if (user && await bcrypt.compare(req.body.password, user.password)) {
@@ -22,8 +23,8 @@ class AuthMiddleware {
                 return next();
             }
             throw new Error('Invalid credentials.');
-        } catch (error: any) {
-            error.status = 401;
+        } catch (error) {
+            withStatus(error, 401);
             next(error);
         }
     }
@@ -38,8 +39,8 @@ class AuthMiddleware {
                 throw new Error('Not authenticated');
             }
             return next();
-        } catch (error: any) {
-            error.status = 401;
+        } catch (error) {
+            withStatus(error, 401);
             next(error);
         }
     }

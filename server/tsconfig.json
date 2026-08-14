@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node10",
+    "lib": ["ES2022"],
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@chat/shared": ["../shared/src/index.ts"],
+      "@chat/shared/*": ["../shared/src/*"]
+    }
+  },
+  "include": ["src"]
+}

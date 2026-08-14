@@ -1,9 +1,7 @@
 import express from 'express';
 import UsersService from './users.service';
 import bcrypt from 'bcrypt';
-import debug from 'debug';
-
-const log: debug.IDebugger = debug('Users Controller');
+import { withStatus } from '../common/http-error';
 
 class UsersController {
 
@@ -13,8 +11,8 @@ class UsersController {
             const user = res.locals.user;
             console.log(user);
             return res.status(200).send(JSON.stringify(user));
-        } catch (error: any) {
-            error.status = 400;
+        } catch (error) {
+            withStatus(error, 400);
             next(error);
         }
     }
@@ -24,8 +22,8 @@ class UsersController {
             req.body.password = await bcrypt.hash(req.body.password, 10);
             await UsersService.createUser(req.body);
             return res.sendStatus(204);
-        } catch (error: any) {
-            error.status = 400;
+        } catch (error) {
+            withStatus(error, 400);
             next(error);
         }
     }
@@ -34,8 +32,8 @@ class UsersController {
         try {
             const id = { _id: req.session._id};
             return res.status(200).send(JSON.stringify(id));
-        } catch (error: any) {
-            error.status = 400;
+        } catch (error) {
+            withStatus(error, 400);
             next(error);
         }
     }
@@ -45,8 +43,8 @@ class UsersController {
             req.session.destroy(_error => {
                 return res.sendStatus(204);
             });
-        } catch (error: any) {
-            error.status = 400;
+        } catch (error) {
+            withStatus(error, 400);
             next(error);
         }
     }

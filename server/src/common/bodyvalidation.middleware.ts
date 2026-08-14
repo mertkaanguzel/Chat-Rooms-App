@@ -1,5 +1,6 @@
 import express from 'express';
 import { validationResult, matchedData } from 'express-validator';
+import { withStatus } from './http-error';
 
 class BodyValidationMiddleware {
     /*
@@ -28,9 +29,9 @@ class BodyValidationMiddleware {
         try {
             if (!errors.isEmpty()) {
                 throw new Error(JSON.stringify(errors.mapped()));
-            } 
-        } catch (error: any) {
-            error.status = 422;
+            }
+        } catch (error) {
+            withStatus(error, 422);
             next(error);
         }
 
@@ -38,8 +39,8 @@ class BodyValidationMiddleware {
             if (Object.keys(data).length !== Object.keys(req.body).length) {
                 throw new Error('Invalid request body.');
             }
-        } catch (error: any) {
-            error.status = 400;
+        } catch (error) {
+            withStatus(error, 400);
             next(error);
         }
         return next();

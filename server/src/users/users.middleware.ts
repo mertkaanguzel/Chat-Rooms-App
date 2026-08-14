@@ -1,8 +1,6 @@
-import debug from 'debug';
 import express from 'express';
 import UsersService from './users.service';
-
-const log: debug.IDebugger = debug('Users Middleware');
+import { withStatus } from '../common/http-error';
 
 class UsersMiddleware {
     async validateSameEmailDoesntExist(
@@ -14,8 +12,8 @@ class UsersMiddleware {
             const user = await UsersService.getUserByEmail(req.body.email);
             if (user) throw new Error('Email already in use');
             return next();
-        } catch (error: any) {
-            error.status = 400;
+        } catch (error) {
+            withStatus(error, 400);
             next(error);
         }
     }
@@ -25,15 +23,15 @@ class UsersMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        
+
         try {
             const user = await UsersService.getUserById(req.params.userId);
-            if (!user) throw new Error('User does not exist'); 
+            if (!user) throw new Error('User does not exist');
             res.locals.user = user;
             return next();
-            
-        } catch (error: any) {
-            error.status = 404;
+
+        } catch (error) {
+            withStatus(error, 404);
             next(error);
         }
     }
@@ -44,14 +42,14 @@ class UsersMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        
+
         try {
             if (req.params.userId !== req.session._id) {
                 throw new Error('Not authorized');
             }
-            return next();  
-        } catch (error: any) {
-            error.status = 403;
+            return next();
+        } catch (error) {
+            withStatus(error, 403);
             next(error);
         }
     }

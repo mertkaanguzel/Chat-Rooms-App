@@ -7,8 +7,6 @@
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended"
     ],
-    "overrides": [
-    ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -17,22 +15,39 @@
     "plugins": [
         "@typescript-eslint"
     ],
+    "ignorePatterns": [
+        "node_modules",
+        "**/dist",
+        "package-lock.json",
+        "server/public"
+    ],
+    "overrides": [
+        {
+            "files": ["client/**/*.ts", "client/**/*.tsx"],
+            "env": {
+                "browser": true,
+                "es2021": true,
+                "node": true
+            },
+            "parserOptions": {
+                "ecmaFeatures": { "jsx": true }
+            }
+        },
+        {
+            "files": ["client/**/*.tsx"],
+            "rules": {
+                "indent": "off"
+            }
+        }
+    ],
     "rules": {
-        "indent": [
+        "indent": ["error", 4],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "single"],
+        "semi": ["error", "always"],
+        "@typescript-eslint/no-unused-vars": [
             "error",
-            4
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
+            { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }
         ]
     }
 }
